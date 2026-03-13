@@ -35,12 +35,12 @@ public class CarService {
 
     @Transactional
     public Car save(Car car, List<MultipartFile> imageFiles) {
-        if(imageFiles != null && imageFiles.isEmpty()) {
+        if(imageFiles != null && !imageFiles.isEmpty()) {
             int order = 0;
             for(MultipartFile file : imageFiles) {
                 if(file == null || file.isEmpty()) continue;
                 String contentType = file.getContentType();
-                if(contentType == null || contentType.startsWith("image/")) continue;
+                if(contentType == null || !contentType.startsWith("image/")) continue;
                 try {
                     CarImage img = CarImage.builder()
                             .car(car)
@@ -64,7 +64,7 @@ public class CarService {
         for(MultipartFile file : imageFiles) {
             if(file == null || file.isEmpty()) continue;
             String contentType = file.getContentType();
-            if(contentType == null || contentType.startsWith("image/")) continue;
+            if(contentType == null || !contentType.startsWith("image/")) continue;
             try {
                 CarImage img = CarImage.builder()
                         .car(car)
