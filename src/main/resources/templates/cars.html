@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>All Cars - Used Car Consultancy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="header-brand">
+        <a th:href="@{/}" class="brand" th:text="${consultancyName}">
+            Used Car Consultancy
+        </a>
+
+        <span class="header-mobiles"
+              th:if="${consultancyMobiles != null && !consultancyMobiles.isEmpty()}">
+
+            <a th:each="mobile : ${consultancyMobiles}"
+               th:href="${'tel:+91' + mobile}"
+               th:text="${mobile}"
+               class="header-tel">
+            </a>
+
+        </span>
+    </div>
+
+    <nav>
+        <a th:href="@{/cars}">All Cars</a>
+        <a th:href="@{/login}" th:if="${!isAuthenticated}">Login</a>
+        <a th:href="@{/admin}" th:if="${isAuthenticated}">Admin</a>
+        <a th:href="@{/logout}" th:if="${isAuthenticated}">Logout</a>
+    </nav>
+</header>
+
+<main class="main">
+
+    <h1>All Listings</h1>
+
+    <section class="car-grid" th:if="${!cars.isEmpty()}">
+
+        <a th:each="car : ${cars}"
+           th:href="@{/cars/{id}(id=${car.id})}"
+           class="card">
+
+            <div class="card-img"
+                 th:if="${car.images != null && !car.images.isEmpty()}">
+
+                <img th:src="@{/images/{id}(id=${car.images[0].id})}"
+                     th:alt="${car.model}"
+                     loading="lazy"/>
+            </div>
+
+            <div class="card-img placeholder"
+                 th:if="${car.images == null || car.images.isEmpty()}">
+                No image
+            </div>
+
+            <div class="card-body">
+                <h3 th:text="${car.model}">Model</h3>
+                <p class="price" th:text="${car.price}">Price</p>
+                <p class="variant" th:text="${car.variant}">Variant</p>
+            </div>
+
+        </a>
+
+    </section>
+
+    <p class="empty" th:if="${cars.isEmpty()}">
+        No cars listed yet.
+    </p>
+
+</main>
+
+<footer class="footer">
+
+    <p>Contact proprietors via WhatsApp or SMS.</p>
+
+    <p class="footer-contact"
+       th:if="${consultancyMobileDigits != null && !consultancyMobileDigits.isEmpty()}">
+
+        Contact us:
+
+        <a th:href="${'https://wa.me/91' + consultancyMobileDigits}"
+           target="_blank"
+           rel="noopener"
+           class="btn btn-whatsapp btn-inline">
+            WhatsApp
+        </a>
+
+        <a th:href="${'sms:+91' + consultancyMobileDigits}"
+           class="btn btn-sms btn-inline">
+            SMS
+        </a>
+
+    </p>
+
+</footer>
+
+<script>
+    (function() {
+
+        var KEY = 'ListingScrollPos';
+        var PATH_KEY = 'ListingScrollPath';
+        var path = window.location.pathname || '/';
+
+        if (sessionStorage.getItem(PATH_KEY) === path) {
+
+            var pos = sessionStorage.getItem(KEY);
+
+            if (pos != null) {
+                sessionStorage.removeItem(KEY);
+                sessionStorage.removeItem(PATH_KEY);
+
+                var y = parseInt(pos, 10);
+
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        window.scrollTo(0, y);
+                    });
+                });
+            }
+        }
+
+        document.querySelectorAll('a.card').forEach(function(a) {
+            a.addEventListener('click', function() {
+                sessionStorage.setItem(KEY, String(window.scrollY));
+                sessionStorage.setItem(PATH_KEY, path);
+            });
+        });
+
+    })();
+</script>
+
+</body>
+</html>

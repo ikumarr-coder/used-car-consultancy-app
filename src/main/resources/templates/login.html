@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin Login - Used Car Consultancy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="header-brand">
+        <a th:href="@{/}" class="brand" th:text="${consultancyName}">
+            Used Car Consultancy
+        </a>
+
+        <span class="header-mobiles"
+              th:if="${consultancyMobiles != null && !consultancyMobiles.isEmpty()}">
+
+            <a th:each="mobile : ${consultancyMobiles}"
+               th:href="${'tel:+91' + mobile}"
+               th:text="${mobile}"
+               class="header-tel">
+            </a>
+
+        </span>
+    </div>
+</header>
+
+<main class="main login-main">
+    <div class="login-box">
+        <h1>Admin Login</h1>
+
+        <p th:if="${param.error}" class="error">
+            Invalid username or password.
+        </p>
+
+        <form th:action="@{/login}" method="post">
+
+            <label for="username">Username</label>
+            <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    required
+                    autocomplete="username"/>
+
+            <label for="password">Password</label>
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                    autocomplete="current-password"/>
+
+            <button type="submit" class="btn btn-primary">
+                Login
+            </button>
+
+        </form>
+    </div>
+</main>
+
+<footer class="footer">
+    <p>Only authorised admins can log in.</p>
+
+    <p class="footer-contact"
+       th:if="${consultancyMobileDigits != null && !consultancyMobileDigits.isEmpty()}">
+
+        Contact us:
+
+        <a th:href="${'https://wa.me/91' + consultancyMobileDigits}"
+           target="_blank"
+           rel="noopener"
+           class="btn btn-whatsapp btn-inline">
+            WhatsApp
+        </a>
+
+        <a th:href="${'sms:+91' + consultancyMobileDigits}"
+           class="btn btn-sms btn-inline">
+            SMS
+        </a>
+
+    </p>
+</footer>
+
+</body>
+</html>

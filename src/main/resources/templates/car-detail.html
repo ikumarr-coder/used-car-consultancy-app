@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${car.model} + ' - Used Car Consultancy'">Car Detail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="header-brand">
+        <a th:href="@{/}" class="brand" th:text="${consultancyName}">Used Car Consultancy</a>
+
+        ```
+        <span class="header-mobiles"
+              th:if="${consultancyMobiles != null and !consultancyMobiles.isEmpty()}">
+
+        <a th:each="mobile : ${consultancyMobiles}"
+           th:href="${'tel:+91' + mobile}"
+           th:text="${mobile}"
+           class="header-tel">Mobile</a>
+
+    </span>
+    </div>
+
+    <nav>
+        <a th:href="@{/cars}">All Cars</a>
+        <a th:href="@{/login}" th:if="${!isAuthenticated}">Login</a>
+        <a th:href="@{/admin}" th:if="${isAuthenticated}">Admin</a>
+        <a th:href="@{/logout}" th:if="${isAuthenticated}">Logout</a>
+    </nav>
+    ```
+
+</header>
+
+<main class="main detail-page">
+
+    ```
+    <a th:href="@{/cars}" class="back" id="back-to-list">← All cars</a>
+
+    <article class="detail" th:object="${car}">
+
+        <div class="carousel-wrap"
+             th:if="${car.images != null and !car.images.isEmpty()}">
+
+            <div class="carousel" id="carousel">
+
+                <div class="carousel-slide"
+                     th:each="img, stat : ${car.images}">
+
+                    <img th:src="@{/images/{id}(id=${img.id})}"
+                         th:alt="${car.model}"
+                         loading="lazy"/>
+                </div>
+
+            </div>
+
+            <div class="carousel-dots"
+                 th:if="${car.images.size() > 1}">
+
+            <span th:each="img, stat : ${car.images}"
+                  class="carousel-dot"
+                  th:attr="data-index=${stat.index}"
+                  aria-hidden="true"></span>
+
+                <span class="carousel-counter"
+                      id="carousel-counter">1 / 1</span>
+
+            </div>
+        </div>
+
+        <div class="gallery-placeholder"
+             th:if="${car.images == null or car.images.isEmpty()}">
+            No images
+        </div>
+
+        <div class="detail-info">
+
+            <h1 th:text="*{model}">Model</h1>
+
+            <p class="price" th:text="*{price}">Price</p>
+
+            <p class="variant"
+               th:text="'Variant: ' + *{variant}">
+                Variant
+            </p>
+
+            <div class="proprietor">
+                <p>
+                    <strong th:text="*{proprietorName}">Name</strong>
+                </p>
+                <p class="mobile"
+                   th:text="*{proprietorMobile}">
+                    Mobile
+                </p>
+            </div>
+
+            <div class="contact-buttons">
+
+                <a th:href="${'https://wa.me/91' + car.proprietorMobileDigits}"
+                   target="_blank"
+                   rel="noopener"
+                   class="btn btn-whatsapp">
+                    WhatsApp
+                </a>
+
+                <a th:href="${'sms:+91' + car.proprietorMobileDigits}"
+                   class="btn btn-sms">
+                    SMS
+                </a>
+
+            </div>
+
+        </div>
+
+    </article>
+    ```
+
+</main>
+
+<footer class="footer">
+
+    ```
+    <p>Contact the proprietor via WhatsApp or SMS above.</p>
+
+    <p class="footer-contact"
+       th:if="${consultancyMobileDigits != null and !consultancyMobileDigits.isEmpty()}">
+
+        Contact us:
+
+        <a th:href="${'https://wa.me/91' + consultancyMobileDigits}"
+           target="_blank"
+           rel="noopener"
+           class="btn btn-whatsapp btn-inline">
+            WhatsApp
+        </a>
+
+        <a th:href="${'sms:+91' + consultancyMobileDigits}"
+           class="btn btn-sms btn-inline">
+            SMS
+        </a>
+
+    </p>
+    ```
+
+</footer>
+
+<script>
+
+    (function () {
+
+        var backLink = document.getElementById('back-to-list');
+
+        if (backLink) {
+            backLink.addEventListener('click', function (e) {
+
+                if (window.history.length > 1) {
+                    e.preventDefault();
+                    window.history.back();
+                }
+
+            });
+        }
+
+    })();
+
+</script>
+
+<script>
+
+    (function () {
+
+        var carousel = document.getElementById('carousel');
+        var counter = document.getElementById('carousel-counter');
+        var dots = document.querySelectorAll('.carousel-dot');
+
+        if (!carousel || !carousel.parentElement) return;
+
+        var slides = carousel.querySelectorAll('.carousel-slide');
+        var total = slides.length;
+
+        if (total <= 1) return;
+
+        function update() {
+
+            var scrollLeft = carousel.scrollLeft;
+            var width = carousel.offsetWidth;
+            var index = Math.round(scrollLeft / width);
+
+            index = Math.min(index, total - 1);
+
+            if (counter) {
+                counter.textContent = (index + 1) + ' / ' + total;
+            }
+
+            dots.forEach(function (d, i) {
+                d.classList.toggle('active', i === index);
+            });
+
+        }
+
+        carousel.addEventListener('scroll', update);
+        carousel.addEventListener('touchmove', update);
+
+        dots.forEach(function (dot, i) {
+
+            dot.addEventListener('click', function () {
+
+                carousel.scrollTo({
+                    left: i * carousel.offsetWidth,
+                    behavior: "smooth"
+                });
+
+            });
+
+        });
+
+        update();
+
+    })();
+
+</script>
+
+</body>
+</html>

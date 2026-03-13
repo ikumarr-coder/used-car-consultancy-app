@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${car.id != null} ? 'Edit car' : 'Add car'">Car form</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+
+<body>
+<header class="header">
+    <a th:href="@{/admin}" class="brand">Admin</a>
+    <nav><a th:href="@{/admin}">Listings</a></nav>
+</header>
+
+<main class="main">
+
+    <div th:if="${message}" class="alert success" th:text="${message}"></div>
+
+    <h1 th:text="${car.id != null} ? 'Edit car' : 'Add car'">Car form</h1>
+
+    <!-- MAIN CAR FORM -->
+    <form th:action="@{/admin/save}" method="post" enctype="multipart/form-data" class="form">
+        <input type="hidden" name="id" th:value="${car.id}"/>
+
+        <label>
+            Model
+            <input type="text" name="model" th:value="${car.model}" required/>
+        </label>
+
+        <label>
+            Price
+            <input type="text" name="price" th:value="${car.price}" placeholder="e.g. $5.5 Lakh" required/>
+        </label>
+
+        <label>
+            Variant
+            <select name="variant" id="variant">
+                <option th:each="v : ${variants}"
+                        th:value="${v}"
+                        th:text="${v}"
+                        th:selected="${(car.variant != null && v == car.variant)
+                                      || (v == 'Other' && car.variant != null
+                                      && !#lists.contains(variants, car.variant))}">
+                </option>
+            </select>
+        </label>
+
+        <label id="variantOtherLabel" class="hidden">
+            Variant (other)
+            <input type="text" name="variantOther" id="variantOther"
+                   th:value="${(car.variant != null && !#lists.contains(variants, car.variant)) ? car.variant : ''}"
+                   placeholder="Enter variant"/>
+        </label>
+
+        <label>
+            Proprietor name
+            <input type="text" name="proprietorName" th:value="${car.proprietorName}" required/>
+        </label>
+
+        <label>
+            Proprietor mobile
+            <input type="tel" name="proprietorMobile" th:value="${car.proprietorMobile}"
+                   placeholder="10-digit number" required/>
+        </label>
+
+        <label>
+            Images (multiple)
+            <input type="file" name="images" accept="image/*" multiple/>
+        </label>
+
+        <p class="hint">You can add more images after saving (Edit → Add images).</p>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+
+    <!-- EXTRA SECTION WHEN EDITING -->
+    <div th:if="${car.id != null}" class="edit-extra">
+
+        <h2>Add more images</h2>
+
+        <form th:action="@{/admin/add-images/{id}(id=${car.id})}" method="post"
+              enctype="multipart/form-data" class="form">
+            <input type="file" name="images" accept="image/*" multiple/>
+            <button type="submit" class="btn">Add images</button>
+        </form>
+
+        <h2>Current images</h2>
+
+        <div class="gallery-thumbs"
+             th:if="${car.images != null && !car.images.isEmpty()}">
+
+            <div th:each="img : ${car.images}" class="thumb-wrap">
+                <img th:src="@{/images/{id}(id=${img.id})}" th:alt="${car.model}"/>
+
+                <form th:action="@{/admin/delete-image}" method="post"
+                      onsubmit="return confirm('Remove this image?');">
+                    <input type="hidden" name="carId" th:value="${car.id}"/>
+                    <input type="hidden" name="imageId" th:value="${img.id}"/>
+                    <button type="submit" class="btn small danger">Remove</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<footer class="footer">
+    <p><a th:href="@{/admin}">Back to listings</a></p>
+
+    <p class="footer-contact"
+       th:if="${consultancyMobileDigits != null && !consultancyMobileDigits.isEmpty()}">
+        Contact:
+        <a th:href="${'https://wa.me/91' + consultancyMobileDigits}"
+           target="_blank" rel="noopener"
+           class="btn btn-whatsapp btn-inline">WhatsApp</a>
+
+        <a th:href="${'sms:+91' + consultancyMobileDigits}"
+           class="btn btn-sms btn-inline">SMS</a>
+    </p>
+</footer>
+
+<script>
+    (function () {
+        const sel = document.getElementById('variant');
+        const otherLabel = document.getElementById('variantOtherLabel');
+        const otherInput = document.getElementById('variantOther');
+
+        function toggle() {
+            const show = sel.value === 'Other';
+            otherLabel.classList.toggle('hidden', !show);
+            if (!show) otherInput.value = '';
+        }
+
+        sel.addEventListener('change', toggle);
+        toggle();
+    })();
+</script>
+
+</body>
+</html>
