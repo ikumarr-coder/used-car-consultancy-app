@@ -1,5 +1,5 @@
 # Build stage
-FROM eclipse-temurin:17-jdk AS build
+FROM eclipse-temurin:17-jdk-jammy AS build
 WORKDIR /app
 
 COPY mvnw .
@@ -8,15 +8,15 @@ COPY pom.xml .
 RUN ./mvnw -B dependency:go-offline -DskipTests
 
 COPY src src
-RUN ./mvnw -B -DskipTests package
+RUN ./mvnw -B package -DskipTests
 
 # Run stage
-FROM eclipse-termurin:17-jre
+FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
-COPY --from=build /app/target/used-car-consultancy-1.0.0.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
 ENV PORT=8080
-EXPOSE 9-9-
+EXPOSE 8080
 
 CMD ["sh", "-c", "java -jar app.jar --server.port=${PORT}"]
